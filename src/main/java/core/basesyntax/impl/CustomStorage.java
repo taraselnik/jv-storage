@@ -3,7 +3,7 @@ package core.basesyntax.impl;
 @SuppressWarnings("unchecked")
 public class CustomStorage<K, V> {
     private static final int INIT_CAPACITY = 10;
-    private int size = 0;
+    private int size;
     private final Entry<K, V>[] table;
 
     static class Entry<K, V> {
@@ -29,25 +29,24 @@ public class CustomStorage<K, V> {
     }
 
     public CustomStorage() {
+        this.size = 0;
         table = (Entry<K, V>[]) new Entry[INIT_CAPACITY];
     }
 
     public V get(K key) {
-        for (Entry<K, V> entry : table) {
-            K entryKey = entry != null ? entry.getKey() : null;
-            if (entry != null
-                    && (entryKey == key || entryKey != null
-                    && entryKey.equals(key))) {
-                return entry.getValue();
-            }
+        int index = keyIndex(key);
+
+        if (index >= 0) {
+            return table[index].getValue();
         }
+
         return null;
     }
 
     public void put(K key, V value) {
         int keyIndex = keyIndex(key);
 
-        if (this.size >= INIT_CAPACITY && keyIndex != -1) {
+        if (this.size >= INIT_CAPACITY && keyIndex == -1) {
             throw new RuntimeException("Storage is full");
         }
 
